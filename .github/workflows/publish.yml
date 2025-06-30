@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  check-codes:
+  publish-package:
     runs-on: ubuntu-24.04
 
     steps:
