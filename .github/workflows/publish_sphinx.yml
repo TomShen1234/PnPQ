@@ -3,9 +3,10 @@
 name: Publish Sphinx Documentation
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - main
 
 jobs:
   build-documentation:
