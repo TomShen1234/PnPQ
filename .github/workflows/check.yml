@@ -6,6 +6,8 @@ on:
   pull_request:
     types: [opened, reopened, synchronize]
 
+  workflow_call:
+
 jobs:
   check-codes:
     runs-on: ubuntu-24.04
