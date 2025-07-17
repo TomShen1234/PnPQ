@@ -7,15 +7,18 @@ on:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
 
+  workflow_dispatch:
+
 jobs:
+  run-checks:
+    uses: ./.github/workflows/check.yml
+
   prepare-for-release:
     runs-on: ubuntu-24.04
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-    - name: Run check script
-      uses: ./.github/workflows/check.yml
     - name: Create GitHub Release (draft)
       env:
         GH_TOKEN: ${{ github.token }}
