@@ -27,7 +27,7 @@ jobs:
 
 
   publish-package:
-    needs: prepare-for-release
+    needs: [run-checks, prepare-for-release]
     environment: pypi-test
     runs-on: ubuntu-24.04
     permissions:
