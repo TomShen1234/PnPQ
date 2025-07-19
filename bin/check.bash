@@ -31,7 +31,7 @@ trap trap_exit EXIT
 base_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd -P)"
 project_dir="$(cd "${base_dir}/.." >/dev/null && pwd -P)"
 
-# cd to the directory before running rye
+# cd to the directory before running uv
 cd "${project_dir}"
 
 stdmsg "Running uv sync with dev dependencies..."
