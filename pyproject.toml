@@ -5,6 +5,8 @@ description = "PnPQ is a python library package for controlling optical devices 
 authors = [
     { name = "Amin Taherkhani", email = "amin@sfc.wide.ad.jp" },
     { name = "Andrew Todd", email = "at@auspicacious.org" },
+    { name = "Tom Shen", email = "tomshen@keio.jp" },
+    { name = "Lars Matsumiya", email = "larsmatsumiya@gmail.com" },
 ]
 dependencies = [
     "pyserial>=3.5",
