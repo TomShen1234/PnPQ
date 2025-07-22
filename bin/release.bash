@@ -85,16 +85,14 @@ fi
 
 stdmsg "Next version will be: ${new_version}"
 
-stdmsg "Run checks before starting the release process..."
 # Run the checks script
+stdmsg "Run checks before starting the release process..."
 "${base_dir}/check.bash"
 
 stdmsg "Starting release process..."
 
 # Removing dev from version number in pyproject.toml
 stdmsg "Removing '.dev0' from version in pyproject.toml..."
-
-# Update the version using uv
 uv version "${updated_version}"
 
 stdmsg "Releasing version: ${updated_version}"
@@ -114,35 +112,18 @@ stdmsg "Creating tag 'v${updated_version}'..."
 git tag -am "Release version: ${updated_version}" "v${updated_version}"
 git push origin "v${updated_version}"
 
-# Optional next version argument
-new_version=""
-
-# If an argument is passed, validate it
-if [[ -n ${1-} ]]; then
-  if [[ $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    new_version="$1"
-  else
-    stdmsg "Error: Invalid next version format. Use A.B.C (e.g., 1.2.3)"
-    exit 1
-  fi
-else
-  # No argument provided, increment patch version
-  IFS='.' read -r major minor patch <<<"${updated_version}"
-  new_version="${major}.${minor}.$((patch + 1))"
-fi
-
-stdmsg "Starting next version: ${new_version}"
 # Update the version to the new version (e.g. <version>.dev)
+stdmsg "Starting next version: ${new_version}"
 uv version "${new_version}.dev"
+
 # Commit the next version change
 stdmsg "Committing next version change..."
 git commit -am "Start next version: ${new_version}"
 git push origin "${branch_name}"
 
+# Create a pull request
 pull_request_url="https://github.com/moonshot-nagayama-pj/pnpq/pull/new/${branch_name}"
-
 stdmsg "Please check the pull request at ${pull_request_url}."
-
 if command -v xdg-open &>/dev/null; then
   xdg-open "${pull_request_url}"
 elif command -v open &>/dev/null; then
