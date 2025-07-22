@@ -38,6 +38,7 @@ project_dir="$(cd "${base_dir}/.." >/dev/null && pwd -P)"
 # cd to the directory before running uv
 cd "${project_dir}"
 
+# Ensure that the script is run from the main branch
 current_branch="$(git rev-parse --abbrev-ref HEAD)"
 if [[ ${current_branch} != "main" ]]; then
   errmsg "Error: This script must be ran on the main branch." >&2
@@ -61,7 +62,7 @@ updated_version=${current_version%.dev0}
 
 # Check format of updated_version
 if [[ ! ${updated_version} =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  errmsg "Error: Updated version '${updated_version}' is not in the correct format (A.B.C). Please update the version in pyproject.toml."
+  errmsg "Error: Current version '${updated_version}' is not in the correct format (A.B.C). Please update the version in pyproject.toml."
   exit 1
 fi
 
