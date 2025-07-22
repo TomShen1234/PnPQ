@@ -38,7 +38,8 @@ project_dir="$(cd "${base_dir}/.." >/dev/null && pwd -P)"
 # cd to the directory before running uv
 cd "${project_dir}"
 
-if [ "$(git rev-parse --abbrev-ref HEAD)" != "main" ]; then
+current_branch="$(git rev-parse --abbrev-ref HEAD)"
+if [[ ${current_branch} != "main" ]]; then
   errmsg "Error: This script must be ran on the main branch." >&2
   exit 1
 fi
