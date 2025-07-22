@@ -38,27 +38,22 @@ project_dir="$(cd "${base_dir}/.." >/dev/null && pwd -P)"
 # cd to the directory before running uv
 cd "${project_dir}"
 
+if [ "$(git rev-parse --abbrev-ref HEAD)" != "main" ]; then
+  errmsg "Error: This script must be ran on the main branch." >&2
+  exit 1
+fi
+
 # Ensure that there are no uncommitted changes
 if ! git diff-index --quiet HEAD --; then
   errmsg "Error: There are uncommitted changes in the repository. Please commit or stash them before running this script."
   exit 1
 fi
 
-stdmsg "Run checks before starting the release process..."
-# Run the checks script
-"${base_dir}/check.bash"
-
-stdmsg "Starting release process..."
-
-# stdmsg "Running uv sync..."
-uv sync
-
-# Removing dev from version number in pyproject.toml
-stdmsg "Removing '.dev0' from version in pyproject.toml..."
+stdmsg "Parsing current version and get next version..."
 
 # Get current version
 uv_version_str=$(uv version)
-current_version=$(echo "${uv_version_str}" | awk '{print $2}')
+current_version=$(stdmsg "${uv_version_str}" | awk '{print $2}')
 
 # Remove `.dev0` from the version
 updated_version=${current_version%.dev0}
@@ -68,6 +63,34 @@ if [[ ! ${updated_version} =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   errmsg "Error: Updated version '${updated_version}' is not in the correct format (A.B.C). Please update the version in pyproject.toml."
   exit 1
 fi
+
+# Parse optional next version argument
+new_version=""
+
+# If an argument is passed, validate it
+if [[ -n ${1-} ]]; then
+  if [[ $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    new_version="$1"
+  else
+    echo "Error: Invalid next version format. Use A.B.C (e.g., 1.2.3)"
+    exit 1
+  fi
+else
+  # No argument provided, increment patch version
+  IFS='.' read -r major minor patch <<<"${updated_version}"
+  new_version="${major}.${minor}.$((patch + 1))"
+fi
+
+stdmsg "Next version will be: ${new_version}"
+
+stdmsg "Run checks before starting the release process..."
+# Run the checks script
+"${base_dir}/check.bash"
+
+stdmsg "Starting release process..."
+
+# Removing dev from version number in pyproject.toml
+stdmsg "Removing '.dev0' from version in pyproject.toml..."
 
 # Update the version using uv
 uv version "${updated_version}"
@@ -97,7 +120,7 @@ if [[ -n ${1-} ]]; then
   if [[ $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     new_version="$1"
   else
-    echo "Error: Invalid next version format. Use A.B.C (e.g., 1.2.3)"
+    stdmsg "Error: Invalid next version format. Use A.B.C (e.g., 1.2.3)"
     exit 1
   fi
 else
@@ -114,8 +137,7 @@ stdmsg "Committing next version change..."
 git commit -am "Start next version: ${new_version}"
 git push origin "${branch_name}"
 
-# pull_request_url="https://github.com/moonshot-nagayama-pj/pnpq/pull/new/${branch_name}?title=Release%20${updated_version}"
-pull_request_url="https://github.com/tomshen1234/pnpq/pull/new/${branch_name}?title=Release%20${updated_version}"
+pull_request_url="https://github.com/moonshot-nagayama-pj/pnpq/pull/new/${branch_name}"
 
 stdmsg "Please check the pull request at ${pull_request_url}."
 
